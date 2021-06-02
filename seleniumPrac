@@ -1,0 +1,58 @@
+#!/opt/homebrew/bin/python3
+
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+import time
+
+class CustomError(Exception):
+    """ My Custom Error """
+    pass
+
+class NoDimensionsDisplayed(CustomError):
+    """ Exception raised when the dimensions aren't shown """
+    pass
+
+driver = webdriver.Chrome()
+driver.implicitly_wait(10)
+driver.get("https://www.bookdepository.com/")
+
+isbns = ["9780525538424", "7432895703429", "9781474881326", "9781760402501", "9780553804577"]
+
+# //*[@class='page-slide']//input[@type='text']
+# //*[@class='page-slide']//div[@class='content-wrap']//div[@class='content']/text()[2]
+# //*[@class='page-slide']//div[@class='content-wrap']//div[@class='content']//p
+
+for isbn in isbns:
+    searchbox = driver.find_element_by_xpath("//*[@class='page-slide']//input[@type='text']")
+    searchbox.clear()
+    search_btn = driver.find_element_by_xpath("//*[@class='page-slide']//button[@class='header-search-btn']")
+    print(isbn)
+    searchbox.send_keys(isbn)
+    search_btn.click()
+
+    # scraping the data
+    try:
+        # found = driver.find_element_by_xpath("//div[@class='content-wrap']//div[@class='biblio-info-wrap']")
+        # print(found_flag)
+        type = driver.find_element_by_xpath("//div[@class='content-wrap']//div[@class='biblio-info-wrap']//li[2]//label").text
+        
+        if type != "Dimensions":
+            raise NoDimensionsDisplayed
+
+        dim = driver.find_element_by_xpath("//div[@class='content-wrap']//div[@class='biblio-info-wrap']//li[2]//span").text
+        dim = dim.split('x')
+        width = int(float(dim[0]))
+        height = int(float(dim[1]))
+        print(f"{width} x {height}mm")
+
+        # print(dim.text)
+
+    except NoSuchElementException:
+        print("ISBN not found. Please do manually")
+    
+    except NoDimensionsDisplayed:
+        print("No dimensions where given. Please do manually")
+
+    # time.sleep(1)
+
+driver.quit()

@@ -1,0 +1,15 @@
+#!/Users/derricklaurente/.nvm/versions/node/v15.10.0/bin/node
+const fetch = require("node-fetch");
+console.log("hello world!")
+
+const isbn = '9781760402501';
+// const isbn = '9781474881326';
+
+const result = fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=AIzaSyDkC7Sa8yq_CsjE29qJKl4o96pmSOUEgJc`, {
+    method: 'GET',
+}).then((data) => {
+    return data.json();
+}).then((data) => {
+    console.log(data.items);
+    console.log(data.items[0].volumeInfo.readingModes)
+})

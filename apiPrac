@@ -1,0 +1,41 @@
+#!/opt/homebrew/bin/python3
+
+import json
+from urllib.request import urlopen
+
+# &key=AIzaSyDkC7Sa8yq_CsjE29qJKl4o96pmSOUEgJc
+
+# isbn = "9780525538424"
+# isbn = "1593276036"
+isbns = ["9780525538424", "9781474881326", "9781760402501", "9780553804577"]
+
+for isbn in isbns:
+    apiLink = f"https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}&key=AIzaSyDkC7Sa8yq_CsjE29qJKl4o96pmSOUEgJc"
+
+    # print(api)
+
+    # send a request and get a JSON response
+    resp = urlopen(apiLink)
+    # parse JSON into Python as a dictionary
+    book_data = json.load(resp)
+    # print(book_data["totalItems"])
+    if book_data["totalItems"] > 0:
+        # print(book_data["items"][0]["volumeInfo"])
+        bookSpecs = book_data["items"][0]["volumeInfo"]
+        print(bookSpecs["title"])
+        for author in bookSpecs["authors"]:
+            print(author, ' ')
+        print(bookSpecs["description"])
+        print(bookSpecs["pageCount"])
+        # print(bookSpecs["dimensions"])
+        print(bookSpecs["readingModes"])
+        print(bookSpecs["panelizationSummary"])
+    else:
+        print("No records of this book in API's database. Please do manually!")
+    print("----------------------------")
+
+# res = requests.get(apiLink)
+
+print("Hello World!")
+# print(res.text)
+
